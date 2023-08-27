@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>File Upload and Metadata</title>
+</head>
+<body>
+  <h1>File Upload and Metadata</h1>
+  <form action="/upload" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file">
+    <button type="submit">Upload</button>
+  </form>
+  <div id="metadata"></div>
+  <script>
+    const form = document.querySelector('form');
+    const metadataDiv = document.getElementById('metadata');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      metadataDiv.innerHTML = '';
+
+      const formData = new FormData(form);
+      try {
+        const response = await fetch('/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const metadataHTML = `
+            <p><strong>Filename:</strong> ${data.filename}</p>
+            <p><strong>Filetype:</strong> ${data.filetype}</p>
+            <p><strong>Filesize:</strong> ${data.filesize} bytes</p>
+          `;
+          metadataDiv.innerHTML = metadataHTML;
+        } else {
+          metadataDiv.innerHTML = 'Error uploading file.';
+        }
+      } catch (error) {
+        metadataDiv.innerHTML = 'An error occurred.';
+      }
+    });
+  </script>
+</body>
+</html>
